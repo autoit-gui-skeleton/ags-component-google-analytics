@@ -82,7 +82,7 @@ To configure the behavior of this component, you can set its options in this con
 GAMP_DEBUG_OUPUT_CONSOLE=1
 
 ; [OPTIONAL] active tracking with Google Analytics Measurement Protocol
-GAMP_TRACKING_ENABLE=1
+GAMP_ANALYTICS_CONSENT=1
 ```
 
 If this variable are not defined in configuration file, so, by default `$GAMP_DEBUG_OUPUT_CONSOLE`, and `$GAMP_TRACKING_ENABLE` are set to `False`.

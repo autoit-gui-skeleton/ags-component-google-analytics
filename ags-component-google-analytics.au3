@@ -15,7 +15,7 @@ This component use this optional parameters. Remember in AGS, all parameters are
 defined in ./config/parameters.ini file :
 
  - AGS_GOOGLE_ANALYTICS - GAMP_DEBUG_OUPUT_CONSOLE
- - AGS_GOOGLE_ANALYTICS - GAMP_TRACKING_ENABLE
+ - AGS_GOOGLE_ANALYTICS - GAMP_ANALYTICS_CONSENT
  - AGS_HTTP_REQUEST - PROXY
 
 This component use also 5 global variables. Remember in AGS, all global
@@ -40,6 +40,9 @@ variables are defined in './src/GLOBALS.au3'
 Opt('MustDeclareVars', 1)
 
 
+checkGlobalVariables()
+
+
 ;===============================================================================
 ; Send a request HTTP POST with payload data to server GAMP
 ;
@@ -51,13 +54,12 @@ Opt('MustDeclareVars', 1)
 ; @return void
 ;===============================================================================
 Func hitGAMP($payload)
-  checkGlobalVariables()
 
   Local $output_console = Int(IniRead($APP_PARAMETERS_INI, "AGS_GOOGLE_ANALYTICS", "GAMP_DEBUG_OUPUT_CONSOLE", "NotFound"))
   If($output_console="NotFound") Then
     $output_console = False
   Endif
-  Local $tracking_enable = Int(IniRead($APP_PARAMETERS_INI, "AGS_GOOGLE_ANALYTICS", "GAMP_TRACKING_ENABLE", "NotFound"))
+  Local $tracking_enable = Int(IniRead($APP_PARAMETERS_INI, "AGS_GOOGLE_ANALYTICS", "GAMP_ANALYTICS_CONSENT", "NotFound"))
   If($tracking_enable = "NotFound") Then
     $tracking_enable = False
   Endif
@@ -72,10 +74,6 @@ Func hitGAMP($payload)
   EndIf
   If($tracking_enable=True) Then
     Local $reponse = HttpPOST('http://www.google-analytics.com/collect', $payload, $proxy)
-    If($output_console=True) Then
-      ConsoleWrite("[DEBUG] HTTP Response Status = " & $reponse.Status & @CRLF)
-      ConsoleWrite("[DEBUG] HTTP Response Text = " & $reponse.ResponseText & @CRLF)
-    EndIf
   EndIf
 EndFunc
 
@@ -125,7 +123,7 @@ EndFunc
 ;===============================================================================
 Func hitGAMP_screenview($screenName)
    Local $payload = payload_GAMP_screenview($GAMP_TRACKING_ID, $APP_NAME, $APP_ID, $APP_VERSION, $GAMP_CRYPT_SALT, $screenName)
-   hitGAMP($payload, $GAMP_PROXY, $GAMP_TRACKING_ENABLE, $GAMP_DEBUG_OUPUT_CONSOLE)
+   hitGAMP($payload)
 EndFunc
 
 
@@ -134,7 +132,7 @@ EndFunc
 ;===============================================================================
 Func hitGAMP_event($eventCategory, $eventAction, $eventLabel="", $eventValue="")
    Local $payload = payload_GAMP_event($GAMP_TRACKING_ID, $APP_NAME, $APP_ID, $APP_VERSION, $GAMP_CRYPT_SALT, $eventCategory, $eventAction, $eventLabel, $eventValue)
-   hitGAMP($payload, $GAMP_PROXY, $GAMP_TRACKING_ENABLE, $GAMP_DEBUG_OUPUT_CONSOLE)
+   hitGAMP($payload)
 EndFunc
 
 

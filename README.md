@@ -57,38 +57,65 @@ With AGS-component-google-analytics, you can track user activity inside an AutoI
 
 This library provides few methods:
 
- Methods    | Description
----------------|-------------
-`json_decode_from_file($filePath)` | Decode JSON from a given local file.
-`json_decode_from_url($jsonfileUrl, $proxy = "")` | Decode JSON from a given URL.
-`RELEASES_JSON_get_all_versions($jsonObject)` | Parse all defined version(s) persisted in a decoded RELEASES.json file given.
-`RELEASES_JSON_get_last_version($jsonObject)` | Get last version persisted in RELEASES.json
-`CheckForUpdates($currentApplicationVersion, $remoteUrlReleasesJson, $proxy = "")` | Compare the current version with the last version persisted in an remote RELEASES.json file, in order to check if an update is available.
-`_GUI_launch_CheckForUpdates($main_GUI, $context)` | Launch a check for updates. The build of a GUI exposing the results depends on the context when the check for update is launch : with an user interaction from menu or on startup application. We store the option to search update on starup in the configuration file `./config/parameters.ini` in parameter `LAUNCH_CHECK_FOR_UPDATE_ON_STARTUP`.
-`_GUI_build_view_to_CheckForUpdates($main_GUI, $resultCheckForUpdate, $context = "")` | Create a child GUI use to expose the result of a check updater. It exposes if an update of current application is available. The child GUI is related to a given main GUI of application. If this method is execute on startup, we built this child GUI only if an update is available. And when this method is called by a user interaction, we built this child GUI in any case : no update available, new update or experimental.
+ Methods | Description
+---------|-------------
+`hitGAMP($payload)` | Send a request HTTP POST with payload data to server GAMP
+`hitGAMP_pageview($pageHostname, $pageName, $pageTitle)` | Hit GAMP for a pageview
+`hitGAMP_screenview($screenName)` | Hit GAMP for a screenview
+`hitGAMP_event($eventCategory, $eventAction, $eventLabel="", $eventValue="")` | Hit GAMP for an event
+`hitGAMP_screenview_AND_pageview($screenName, $pageHostname, $pageName, $pageTitle)` | Hit GAMP for a screenview and a pageview
 
 
-### Configuration
 
-To configure the behavior of this component, you can set its options in the `./config/parameters.ini` file. For example, you can enable or disable the search of a new update when the application starts, with the `LAUNCH_CHECK_FOR_UPDATE_ON_STARTUP` variable of the section `AGS_CHECK_FOR_UPDATES`.
+### Configuration of component AGS-component-google analytics
+
+#### Define behavior in configuration file `./config/parameters.ini`
+
+With AGS, you must have the configuration file `./config/parameters.ini`. This file must not save with control version. You can use `./config/parameters.ini.dist` as a “template” of what your parameters.ini file should look like. Set parameters here that may be different on each application. Only this file is save with control version and push on remote server.
+
+To configure the behavior of this component, you can set its options in this configuration file. The configuration use the section `AGS_GOOGLE_ANALYTICS`.
 
 ```ini
 ## ./config/parameters.ini ##
-[AGS_CHECK_FOR_UPDATES]
-; [REQUIRED] Enable/disable the search of a new update on start-up.
-LAUNCH_CHECK_FOR_UPDATE_ON_STARTUP=1
+[AGS_GOOGLE_ANALYTICS]
+; [OPTIONAL] active debug output in console for all HTPP resquest send with GAMP
+GAMP_DEBUG_OUPUT_CONSOLE=1
+
+; [OPTIONAL] active tracking with Google Analytics Measurement Protocol
+GAMP_TRACKING_ENABLE=1
+```
+
+If this variable are not defined in configuration file, so, by default `$GAMP_DEBUG_OUPUT_CONSOLE`, and `$GAMP_TRACKING_ENABLE` are set to `False`.
+
+In this component we use an another component [AGS-component-http-request](https://yarnpkg.com/fr/package/@autoit-gui-skeleton/ags-component-http-request). This library is used to send HTTP request in GET or POST method, and with or wihtout behind a corporate proxy, in order to send data to GA server (hit with GAMP). So you can also configure this component. For example, you can set a proxy for all HTTP connections, or set different types of timeouts. By default, this component looks in the configuration file if a proxy is defined in the PROXY variable in the AGS_HTTP_REQUEST section.
+
+```ini
+## ./config/parameters.ini ##
+
+[AGS_HTTP_REQUEST]
+; [OPTIONAL] Use a proxy for http connexion or choose NONE to disable it
+# PROXY=NONE
+PROXY=http://myProxy.com:20100
 ```
 
 
-### Example of an application that implements AGS-component-check-for-updates
+#### Set constants in ./src/GLOBALS.au3
 
-Take a look of this example of an AutoIt application which implement AGS-component-check-for-updates [ApplicationWithCheckForUpdates](https://github.com/autoit-gui-skeleton/AGS-component-check-for-updates/tree/master/example/ApplicationWithCheckForUpdates). This application have this features :
+In AGS framework all constants and global variables are set in one place `./src/GLOBALS.au3`, with the exception to global variables of graphic elements which are set in each specific view file. AGS-component-google-analytics use also 5 global variables. If only one of these variables is not defined then the program returns an error and stops immediately
 
- - Check update on startup AutoIt application ;
- - Check update from the menu "? > Check for update" ;
- - Change settings application from the view "Configuration > Settings". Values are persisted into the configuration file ./config/parameters.ini. In this view, we can set proxy parameters to specify how this application try to connect to internet.
+```autoit
+; The google tracking id to used
+Global const $GAMP_TRACKING_ID = "UA-xxxxxxxxx-y"
 
-If the option to check update on startup application is enabled, and if a new version of this application is available, when the user starts application he gives this information on a child window:
+; A string used as a salt in encryption algorithm
+Global const $GAMP_CRYPT_SALT = "2080-M3-M?GADR1Vx"
+
+; Application main constants
+Global Const $APP_NAME = "test"
+Global Const $APP_ID = "acme.test"
+Global Const $APP_VERSION = "1.2.3"
+```
+
 
 
 

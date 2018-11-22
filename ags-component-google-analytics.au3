@@ -11,11 +11,16 @@ AutoIt version    : 3.3.14.5
 Author            : v20100v <7567933+v20100v@users.noreply.github.com>
 Package           : AGS version 1.0.0
 
-Global variables used in this component are :
+This component use this optional parameters. Remember in AGS, all parameters are
+defined in ./config/parameters.ini file :
 
- - $GAMP_DEBUG_OUPUT_CONSOLE {bool}
- - $GAMP_TRACKING_ENABLE {bool}
- - $GAMP_PROXY {string}
+ - AGS_GOOGLE_ANALYTICS - GAMP_DEBUG_OUPUT_CONSOLE
+ - AGS_GOOGLE_ANALYTICS - GAMP_TRACKING_ENABLE
+ - AGS_HTTP_REQUEST - PROXY
+
+This component use also 5 global variables. Remember in AGS, all global
+variables are defined in './src/GLOBALS.au3'
+
  - $GAMP_TRACKING_ID {string}
  - $GAMP_CRYPT_SALT {string}
  - $APP_NAME {string}
@@ -45,27 +50,73 @@ Opt('MustDeclareVars', 1)
 
 ; @return void
 ;===============================================================================
-Func hitGAMP($payload, $proxy="", $tracking_enable=False, $output_console=False)
-   If($output_console=True) Then
-	  ConsoleWrite("[DEBUG] payload => POST HTTP http://www.google-analytics.com " & $payload & @CRLF)
-   EndIf
+Func hitGAMP($payload)
+  checkGlobalVariables()
 
-   If($tracking_enable=True) Then
-	  Local $reponse = HttpPOST('http://www.google-analytics.com/collect', $payload, $proxy)
-	  If($output_console=True) Then
-		 ConsoleWrite("[DEBUG] HTTP Response Status = " & $reponse.Status & @CRLF)
-		 ConsoleWrite("[DEBUG] HTTP Response Text = " & $reponse.ResponseText & @CRLF)
-	  EndIf
-   EndIf
+  Local $output_console = Int(IniRead($APP_PARAMETERS_INI, "AGS_GOOGLE_ANALYTICS", "GAMP_DEBUG_OUPUT_CONSOLE", "NotFound"))
+  If($output_console="NotFound") Then
+    $output_console = False
+  Endif
+  Local $tracking_enable = Int(IniRead($APP_PARAMETERS_INI, "AGS_GOOGLE_ANALYTICS", "GAMP_TRACKING_ENABLE", "NotFound"))
+  If($tracking_enable = "NotFound") Then
+    $tracking_enable = False
+  Endif
+  Local $proxy = IniRead($APP_PARAMETERS_INI, "AGS_HTTP_REQUEST", "PROXY", "NotFound")
+  If ($proxy = "NotFound") Then
+    $proxy = ""
+  EndIf
+
+
+  If($output_console=True) Then
+    ConsoleWrite("[DEBUG] payload => POST HTTP http://www.google-analytics.com " & $payload & @CRLF)
+  EndIf
+  If($tracking_enable=True) Then
+    Local $reponse = HttpPOST('http://www.google-analytics.com/collect', $payload, $proxy)
+    If($output_console=True) Then
+      ConsoleWrite("[DEBUG] HTTP Response Status = " & $reponse.Status & @CRLF)
+      ConsoleWrite("[DEBUG] HTTP Response Text = " & $reponse.ResponseText & @CRLF)
+    EndIf
+  EndIf
+EndFunc
+
+
+;===============================================================================
+; Check if global variables for this component exist
+;
+; @return void in case of no problem, and exit application otherwise
+;===============================================================================
+Func checkGlobalVariables()
+  local $msgError = ""
+  If Not IsDeclared("GAMP_TRACKING_ID") Then
+    $msgError = $msgError & "The global variable $GAMP_TRACKING_ID doesn't exist. It must be defined in GLOBALS.au3 file." & @CRLF
+  EndIf
+  If Not IsDeclared("GAMP_CRYPT_SALT") Then
+    $msgError = $msgError & "The global variable $GAMP_CRYPT_SALT doesn't exist. It must be defined in GLOBALS.au3 file." & @CRLF
+  EndIf
+  If Not IsDeclared("APP_NAME") Then
+    $msgError = $msgError & "The global variable $APP_NAME doesn't exist. It must be defined in GLOBALS.au3 file." & @CRLF
+  EndIf
+  If Not IsDeclared("APP_ID") Then
+    $msgError = $msgError & "The global variable $APP_ID doesn't exist. It must be defined in GLOBALS.au3 file." & @CRLF
+  EndIf
+  If Not IsDeclared("APP_VERSION") Then
+    $msgError = $msgError & "The global variable $APP_ID doesn't exist. It must be defined in GLOBALS.au3 file." & @CRLF
+  EndIf
+
+  If($msgError <> "") Then
+    MsgBox(16, "Error in ags-component-google-analytics", "Application stop now, because :" &@CRLF&@CRLF&$msgError)
+    Exit
+  EndIf
 EndFunc
 
 
 ;===============================================================================
 ; Hit GAMP for a pageview
+;
 ;===============================================================================
 Func hitGAMP_pageview($pageHostname, $pageName, $pageTitle)
-   local $payload = payload_GAMP_pageview($GAMP_TRACKING_ID, $APP_NAME, $APP_ID, $APP_VERSION, $GAMP_CRYPT_SALT, $pageHostname, $pageName, $pageTitle)
-   hitGAMP($payload, $GAMP_PROXY, $GAMP_TRACKING_ENABLE, $GAMP_DEBUG_OUPUT_CONSOLE)
+  local $payload = payload_GAMP_pageview($GAMP_TRACKING_ID, $APP_NAME, $APP_ID, $APP_VERSION, $GAMP_CRYPT_SALT, $pageHostname, $pageName, $pageTitle)
+  hitGAMP($payload)
 EndFunc
 
 

@@ -14,7 +14,7 @@ In order to simplify the management of the dependencies of an AutoIt project bui
 We assume that you have already install [Node.js](https://nodejs.org/) and [Yarn](https://yarnpkg.com/lang/en/), for example with [Chocolatey](https://chocolatey.org/), so to install AGS-component-http-request, just type in the root folder of your project where the `package.json` is saved :
 
 ```
-λ  yarn add @autoit-gui-skeleton/ags-component-google-analytics --modules-folder web/vendor
+λ  yarn add @autoit-gui-skeleton/ags-component-google-analytics --modules-folder vendor
 ```
 
 This package is installed into the `./vendor` directory. To use it in your AutoIt program, you need to include this library with this instruction:
@@ -117,6 +117,16 @@ Global Const $APP_VERSION = "1.2.3"
 ```
 
 
+## Developpement
+
+### Publish a new version on Yarn
+
+If it's the first time you publish a scoped package. The default access setting is private, but for this you need a paid account. Hence the error message. So in order to avoid HTTP 402 error, you can set the scoped package as public like this. Dont't forget to log in.
+
+```
+yarn login
+yarn publish --access=public
+```
 
 
 <br/>

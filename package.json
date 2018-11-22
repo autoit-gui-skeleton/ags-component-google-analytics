@@ -1,0 +1,49 @@
+{
+  "name": "@autoit-gui-skeleton/ags-component-google-analytics",
+  "version": "1.0.1",
+  "description": "Add the feature to track activity with Google Analytics Measurement Protocol inside an AutoIt application built with the AGS framework.",
+  "author": "20100 <vb20100bv@gmail.com> (https://github.com/v20100v)",
+  "contributors": [
+    "v20100v <vb20100bv@gmail.com> (https://github.com/v20100v)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "AGS",
+    "AutoIt",
+    "AutoIt-GUI-Skeleton",
+    "AGS-component",
+    "google-analytics",
+    "GAMP"
+  ],
+  "homepage": "https://autoit-gui-skeleton.github.io/",
+  "repository": {
+    "url": "https://github.com/autoit-gui-skeleton/ags-component-google-analytics.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/autoit-gui-skeleton/ags-component-google-analytics/issues"
+  },
+  "dependencies": {
+    "@autoit-gui-skeleton/ags-component-http-request": "^1.0.0"
+  },
+  "files": [
+    ".gitignore",
+    ".yarnrc",
+    "AGS-component-check-for-updates.au3",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "yarn.lock"
+  ],
+  "AGS": {
+    "framework": {
+      "version": "1.0.0"
+    },
+    "AutoIt": {
+      "version": "3.3.14.5"
+    },
+    "component": {
+      "main": "ags-component-google-analytics.au3"
+    }
+  }
+}

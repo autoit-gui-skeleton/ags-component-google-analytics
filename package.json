@@ -29,7 +29,7 @@
   "files": [
     ".gitignore",
     ".yarnrc",
-    "AGS-component-check-for-updates.au3",
+    "ags-component-google-analytics.au3",
     "LICENSE",
     "package.json",
     "README.md",
